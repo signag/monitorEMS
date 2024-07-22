@@ -1,0 +1,112 @@
+{
+    "measurementInterval": 120,
+    "femsURL": "http://femsxxxxx:80",
+    "femsUsername": "x",
+    "femsPassword": "user",
+    "InfluxOutput": true,
+    "InfluxURL": "",
+    "InfluxOrg": "",
+    "InfluxToken": "",
+    "InfluxBucket": "FEMS",
+    "csvOutput": false,
+    "csvDir": "",
+    "femsData": [
+        {
+            "measurement": "fems_sum",
+            "port": 80,
+            "url": "/rest/channel",
+            "component": "/_sum",
+            "channel_root": "/",
+            "csvFile": "monitorFems_sum.csv",
+            "query": "/rest/channel/_sum/[CEGP].*",
+            "tag_datapoints": [],
+            "field_datapoints": [
+                "ProductionDcActualPower",
+                "ProductionDcActiveEnergy",
+                "ProductionActivePower",
+                "ProductionActiveEnergy",
+                "ConsumptionActivePower",
+                "ConsumptionActiveEnergy",
+                "GridActivePower",
+                "GridBuyActiveEnergy",
+                "GridSellActiveEnergy",
+                "EssCapacity",
+                "EssSoc",
+                "EssActivePower",
+                "EssDischargePower",
+                "EssDcChargeEnergy",
+                "EssDcDischargeEnergy",
+                "EssActiveChargeEnergy",
+                "EssActiveDischargeEnergy"
+            ]
+        },
+        {
+            "measurement": "fems_battery",
+            "port": 80,
+            "url": "/rest/channel",
+            "component": "/battery?",
+            "channel_root": "/",
+            "csvFile": "monitorFems_battery.csv",
+            "query": "/rest/channel/battery\\d{1}/[CMNRV].*",
+            "tag_datapoints": [],
+            "field_datapoints": [
+                "NumberOfTowers",
+                "NumberOfModulesPerTower",
+                "RackNumberOfCellsInSeriesPerModule",
+                "Capacity",
+                "Voltage",
+                "MaxCellVoltage",
+                "MinCellVoltage"
+            ]
+        },
+        {
+            "measurement": "fems_battery_towers",
+            "port": 80,
+            "url": "/rest/channel",
+            "component": "/battery?",
+            "channel_root": "/Tower?",
+            "csvFile": "monitorFems_battery_towers.csv",
+            "query": "/rest/channel/battery\\d{1}/Tower\\d{1}[ARSU].*",
+            "tag_datapoints": [],
+            "field_datapoints": [
+                "RemainingCapacity",
+                "UsableCapacity",
+                "Soc",
+                "Soh",
+                "AvarageCellVoltage",
+                "StatusBatteryCharging",
+                "StatusBatteryDischarging",
+                "StatusBatteryIdle"
+            ]
+        },
+        {
+            "measurement": "fems_battery_modules",
+            "port": 80,
+            "url": "/rest/channel",
+            "component": "/battery?",
+            "channel_root": "/Tower?Module?",
+            "csvFile": "monitorFems_battery_modules.csv",
+            "query": "/rest/channel/battery\\d{1}/Tower\\d{1}Module\\d{1}[ST].*",
+            "tag_datapoints": [
+                "SerialNumber"
+            ],
+            "field_datapoints": [
+                "TemperatureSensor1",
+                "TemperatureSensor2",
+                "TemperatureSensor3"
+            ]
+        },
+        {
+            "measurement": "fems_battery_cells",
+            "port": 80,
+            "url": "/rest/channel",
+            "component": "/battery?",
+            "channel_root": "/Tower?Module?Cell???",
+            "csvFile": "monitorFems_battery_cells.csv",
+            "query": "/rest/channel/battery\\d{1}/Tower\\d{1}Module\\d{1}Cell\\d{3}V.*",
+            "field_datapoints": [
+                "Voltage"
+            ]
+        }
+    ]
+}
