@@ -1,0 +1,14 @@
+[Unit]
+Description=monitorFems
+After=network.target
+
+[Service]
+ExecStart=/home/pi/dev/monitorFeneconPV/.venv/bin/python -u monitorFems.py -s
+WorkingDirectory=/home/pi/dev/monitorFeneconPV/monitorFems
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target

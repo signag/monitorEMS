@@ -66,17 +66,22 @@
             "component": "/battery?",
             "channel_root": "/Tower?",
             "csvFile": "monitorFems_battery_towers.csv",
-            "query": "/rest/channel/battery\\d{1}/Tower\\d{1}[ARSU].*",
+            "query": "/rest/channel/battery\\d{1}/Tower\\d{1}[ABCNRSUV].*",
             "tag_datapoints": [],
             "field_datapoints": [
+                "BmsSerialNumber",
+                "BmsSoftwareVersion",
                 "RemainingCapacity",
                 "UsableCapacity",
+                "NoOfCycles",
                 "Soc",
                 "Soh",
                 "AvarageCellVoltage",
                 "StatusBatteryCharging",
                 "StatusBatteryDischarging",
-                "StatusBatteryIdle"
+                "StatusBatteryIdle",
+                "Voltage",
+                "Current"
             ]
         },
         {
@@ -106,6 +111,30 @@
             "query": "/rest/channel/battery\\d{1}/Tower\\d{1}Module\\d{1}Cell\\d{3}V.*",
             "field_datapoints": [
                 "Voltage"
+            ]
+        },
+        {
+            "measurement": "fems_heating_element",
+            "port": 80,
+            "url": "/rest/channel",
+            "component": "/ctrlIoHeatingElement?",
+            "channel_root": "/",
+            "csvFile": "monitorFems_heating_element.csv",
+            "query": "/rest/channel/ctrlIoHeatingElement\\d{1}/L.*",
+            "field_datapoints": [
+                "Level"
+            ]
+        },
+        {
+            "measurement": "fems_heatpump",
+            "port": 80,
+            "url": "/rest/channel",
+            "component": "/ctrlIoHeatPump?",
+            "channel_root": "/",
+            "csvFile": "monitorFems_heatpump.csv",
+            "query": "/rest/channel/ctrlIoHeatPump\\d{1}/S.*",
+            "field_datapoints": [
+                "State"
             ]
         }
     ]

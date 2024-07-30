@@ -3,7 +3,7 @@
 Module monitorFems
 
 This module periodically reads data from Fenecon FEMS
-and stores data in an InfluxDB or a CSV file
+and stores data in an InfluxDB or CSV files
 """
 
 import time
@@ -52,8 +52,10 @@ CFGFILENAME = "monitorFems.json"
 
 
 def getCl():
-    """
-    getCL: Get and process command line parameters
+    """Get command line parameters
+
+    Raises:
+        ValueError: Invalid command line parameter
     """
 
     import argparse
@@ -76,6 +78,7 @@ def getCl():
 
     This configuration file specifies credentials for FEMS access,
     the data to read, the connection to the InfluxDB and other runtime parameters.
+    The configuration file also defines the FEMS datapoints which will be stored as measurements.
     """,
     )
     parser.add_argument(
@@ -197,8 +200,17 @@ def getCl():
 
 
 def getConfig():
-    """
-    Get configuration for fritzToInfluxHA
+    """Get the configuration form the configuration file
+    
+    At first the configuration file is searched in a sequence of paths:
+    ./tests/data -> ./config/ -> ~/.config
+    Whenever a file CFGFILENAME is used, this is taken.
+    
+    Configuration entries found in the configuration file overwrite
+    the global configuration cfg
+
+    Raises:
+        ValueError: Invalid or missing configuration parameters
     """
     global cfgFile
     global cfg
@@ -299,12 +311,17 @@ def getConfig():
 
 
 def waitForNextCycle(waitUntilMidnight: bool = False):
-    """
-    Wait for next measurement cycle.
+    """Wait for next measurement cycle.
 
     This function assures that measurements are done at specific times depending on the specified interval
     In case that measurementInterval is an integer multiple of 60, the waiting time is calculated in a way,
     that one measurement is done every full hour.
+
+    Args:
+        waitUntilMidnight (bool, optional): Defaults to False.
+            When True, the next cycle will not be started before midnight.
+            Typically, this is used in cases with limited number of service calls 
+            where the daily quota has been exceeded.
     """
     global cfg
 
@@ -370,14 +387,37 @@ def waitForNextCycle(waitUntilMidnight: bool = False):
         time.sleep(waitTimeSec)
         
 def getFemsSession() -> requests.session:
-    """
-    Log into FEMS and return the session
+    """The function initializes a session for subsequent service calls
+
+    Returns:
+        requests.session: Session with authorization
     """
     session = requests.Session()
     session.auth = (cfg["femsUsername"], cfg["femsPassword"])
     return session    
 
-def getFemsData(session, femsd: dict) -> dict:
+def getFemsData(session: requests.Session, femsd: dict) -> dict:
+    """Run a FEMS query and return the result as dictionary
+    
+    The function uses the given session wth the query URL as specified 
+    in the femsData elements of the configuration file 
+
+    Args:
+        session (requests.Session): 
+            session object to be used for query
+        femsd (dict): 
+            An element of the femsData list of the configuration file.
+            The URL needs to be specified in element "query"
+
+    Raises:
+        FemsAccessError:
+            An error occurred when accessing FEMS or when transforming
+            the JSON result to dictionary
+
+    Returns:
+        dict: Dictionary with query results
+    """
+   
     url = cfg["femsURL"] + femsd["query"]
     try:
         response = session.get(url)
@@ -395,16 +435,33 @@ def getFemsData(session, femsd: dict) -> dict:
     return respDict
 
 def getTagsFromKey(key: str, tpl: str, tags: dict) -> dict:
-    """Analyze a key and add found tags to the given tags dict
+    """Analyze a given FEMS key and return a dictionary of Influx tags
     
-    params:
-    key:    key in the form "xxxxx0", "xxxxx0yyyy1", "xxxxx0yyyy1zzz123"
-    tpl:    tpl in the form "xxxxx?", "xxxxx?yyyy?", "xxxxx?yyyy?zzz???"
-    tags:   a dict of tags to which new tags will be added
-    return: augmented dict of tags
-            xxxxx, yyyy, zzz are tag names
-            substrings at ? are tag values
-    """
+    The analysis of the key is done using the given template.
+    Keys may be either EMS Component IDs or Channel-IDs, which are part of the 
+    URL for the REST endpoint of an EMS datapoint.
+    For example for the address
+    battery0/Tower0Module0Cell009Voltage
+    we have
+    - Component ID: battery0
+    - Channel-ID  : Tower0Module0Cell009Voltage
+    
+    Using the template
+                    Tower?Module?Cell???
+    Will result in the tag dictionary:
+    {"Tower": "0", "Module": "0", "Cell": "009"}
+
+    Args:
+        key (str): Key to be analyzed
+        tpl (str): Template to be used for analysis
+        tags (dict): Dictionary of tags to which new tags will be added
+
+    Raises:
+        ValueError: Key shorter than template
+
+    Returns:
+        dict: Extended dictionary of tags
+    """    
     keyRem = key
     tplRem = tpl
     if len(keyRem) < len(tplRem):
@@ -439,9 +496,35 @@ def getTagsFromKey(key: str, tpl: str, tags: dict) -> dict:
     return tags
 
 def storeFemsData(influxWriteAPI, frd: dict, femsd: dict):
-    """
-    Store FEMS _sum data in InfluxDB or file
+    """Storedata from a FEMS query as measurements in Influx
+    
+    Queries are typically done uing regular expressions and will, therefore,
+    include multiple results.
+    This function iterates the results and and filters them with respect to
+    the configuration specified for the specific query.
+    
+    FEMS datapoints are either used as tags (e.g. "SerialNumber") or as Influx fields
+    Field names are obtained from the FEMS Channel-Id, starting after the configured
+    "channel_root".
+    Only FEMS datapoints are considered for which the field name is in the list of
+    configured "field_datapoints".
+    Tags are obtained from the FEMS Component-ID and that part of the Channel-ID 
+    which corresponds to the configured "channel_root".
+    Tags from "tag_datapoints" (e.g. "SerialNumber") are never considered as part 
+    of a measurement key.
+    Measurement keys are only obtained from the tag-concatenations resulting from
+    FEMS Component-IDs and Channel-IDs.
+    
+    In a first step all FEMS datapoints are analyzed and, if a valid datapoint
+    is found, it field (key:value) is added to a measurement with the same key,
+    resulting from the concatenation of the identifying tags.
+    
+    Finally, the list of measurements is written to Influx and/or to a csv File.
 
+    Args:
+        influxWriteAPI: Influx write_api object
+        frd (dict): FEMS request data from 
+        femsd (dict): [description]
     """
     csvFile = cfg["csvDir"] + femsd["csvFile"]
     sep = ";"
@@ -536,7 +619,10 @@ def storeFemsData(influxWriteAPI, frd: dict, femsd: dict):
                     for key, value in point["tags"].items():
                         data = data + sep + value
                 for i in range(nrFieldDp):
-                    data = data + sep + str(point["fields"][fieldDp[i]])
+                    if fieldDp[i] in point["fields"]:
+                        data = data + sep + str(point["fields"][fieldDp[i]])
+                    else:
+                        data = data + sep
                 data = data + "\n"
                 writeCsv(csvFile, title, data)
                 logger.debug("FEMS data written to csv file for key %s", pointKey)
