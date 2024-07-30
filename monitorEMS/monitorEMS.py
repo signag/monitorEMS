@@ -1,9 +1,11 @@
 #!/usr/bin/python3
 """
-Module monitorFems
+Module monitorEMS
 
-This module periodically reads data from Fenecon FEMS
-and stores data in an InfluxDB or CSV files
+This module periodically reads data from an OpenEMS Energy Management System
+and stores data in an InfluxDB and/or CSV files.
+
+For openEMS, see: https://github.com/OpenEMS/openems
 """
 
 import time
@@ -27,16 +29,18 @@ logger = logging_plus.getLogger("main")
 testRun = False
 servRun = False
 
+
 class FemsAccessError(Exception):
     pass
+
 
 # Configuration defaults
 cfgFile = ""
 cfg = {
     "measurementInterval": 120,
-    "femsURL": None,
-    "femsUsername": None,
-    "femsPassword": None,
+    "emsURL": None,
+    "emsUsername": None,
+    "emsPassword": None,
     "InfluxOutput": False,
     "InfluxURL": None,
     "InfluxOrg": None,
@@ -44,11 +48,11 @@ cfg = {
     "InfluxBucket": None,
     "csvOutput": False,
     "csvFile": "",
-    "femsData": [],
+    "emsData": [],
 }
 
 # Constants
-CFGFILENAME = "monitorFems.json"
+CFGFILENAME = "monitorEMS.json"
 
 
 def getCl():
@@ -69,16 +73,16 @@ def getCl():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""
-    This program periodically reads data from a FEMS system
+    This program periodically reads data from an openEMS Energy Management System
     and stores these as measurements in an InfluxDB database.
 
     If not otherwises specified on the command line, a configuration file
-       monitorFems.json
+       monitorEMS.json
     will be searched sequentially under ./tests/data, $HOME/.config or /etc.
 
-    This configuration file specifies credentials for FEMS access,
+    This configuration file specifies credentials for EMS access,
     the data to read, the connection to the InfluxDB and other runtime parameters.
-    The configuration file also defines the FEMS datapoints which will be stored as measurements.
+    The configuration file also defines the EMS datapoints which will be stored as measurements.
     """,
     )
     parser.add_argument(
@@ -201,11 +205,11 @@ def getCl():
 
 def getConfig():
     """Get the configuration form the configuration file
-    
+
     At first the configuration file is searched in a sequence of paths:
     ./tests/data -> ./config/ -> ~/.config
     Whenever a file CFGFILENAME is used, this is taken.
-    
+
     Configuration entries found in the configuration file overwrite
     the global configuration cfg
 
@@ -246,15 +250,19 @@ def getConfig():
 
     if cfgFile == "":
         # Check for config file in $HOME/.config directory
-        homeDir = os.environ["HOME"]
-        cfgFile = homeDir + "/.config/" + CFGFILENAME
-        if not os.path.exists(cfgFile):
-            logger.info("Config file not found: %s", cfgFile)
-            # Check for config file in etc directory
-            cfgFile = "/etc/" + CFGFILENAME
+        try:
+            homeDir = os.environ["HOME"]
+            cfgFile = homeDir + "/.config/" + CFGFILENAME
             if not os.path.exists(cfgFile):
                 logger.info("Config file not found: %s", cfgFile)
-                cfgFile = ""
+                # Check for config file in etc directory
+                cfgFile = "/etc/" + CFGFILENAME
+                if not os.path.exists(cfgFile):
+                    logger.info("Config file not found: %s", cfgFile)
+                    cfgFile = ""
+        except KeyError:
+            logger.info("Environment variable HOME not set.")
+            cfgFile = ""
 
     if cfgFile == "":
         # No cfg available
@@ -265,12 +273,12 @@ def getConfig():
             conf = json.load(f)
             if "measurementInterval" in conf:
                 cfg["measurementInterval"] = conf["measurementInterval"]
-            if "femsURL" in conf:
-                cfg["femsURL"] = conf["femsURL"]
-            if "femsUsername" in conf:
-                cfg["femsUsername"] = conf["femsUsername"]
-            if "femsPassword" in conf:
-                cfg["femsPassword"] = conf["femsPassword"]
+            if "emsURL" in conf:
+                cfg["emsURL"] = conf["emsURL"]
+            if "emsUsername" in conf:
+                cfg["emsUsername"] = conf["emsUsername"]
+            if "emsPassword" in conf:
+                cfg["emsPassword"] = conf["emsPassword"]
             if "InfluxOutput" in conf:
                 cfg["InfluxOutput"] = conf["InfluxOutput"]
             if "InfluxURL" in conf:
@@ -287,19 +295,19 @@ def getConfig():
                 cfg["csvDir"] = conf["csvDir"]
             if cfg["csvDir"] == "":
                 cfg["csvOutput"] = False
-            if "femsData" in conf:
-                cfg["femsData"] = conf["femsData"]
+            if "emsData" in conf:
+                cfg["emsData"] = conf["emsData"]
 
-    # Check FEMS credentials
-    if not cfg["femsUsername"]:
-        raise ValueError("femsUsername not specified")
-    if not cfg["femsPassword"]:
-        raise ValueError("femsPassword not specified")
+    # Check EMS credentials
+    if not cfg["emsUsername"]:
+        raise ValueError("emsUsername not specified")
+    if not cfg["emsPassword"]:
+        raise ValueError("emsPassword not specified")
 
     logger.info("Configuration:")
     logger.info("    measurementInterval:%s", cfg["measurementInterval"])
-    logger.info("    femsUsername:%s", cfg["femsUsername"])
-    logger.info("    femsPassword:%s", cfg["femsPassword"])
+    logger.info("    emsUsername:%s", cfg["emsUsername"])
+    logger.info("    emsPassword:%s", cfg["emsPassword"])
     logger.info("    InfluxOutput:%s", cfg["InfluxOutput"])
     logger.info("    InfluxURL:%s", cfg["InfluxURL"])
     logger.info("    InfluxOrg:%s", cfg["InfluxOrg"])
@@ -307,7 +315,7 @@ def getConfig():
     logger.info("    InfluxBucket:%s", cfg["InfluxBucket"])
     logger.info("    csvOutput:%s", cfg["csvOutput"])
     logger.info("    csvFile:%s", cfg["csvFile"])
-    logger.info("    femsData:%s", len(cfg["femsData"]))
+    logger.info("    emsData:%s", len(cfg["emsData"]))
 
 
 def waitForNextCycle(waitUntilMidnight: bool = False):
@@ -320,16 +328,23 @@ def waitForNextCycle(waitUntilMidnight: bool = False):
     Args:
         waitUntilMidnight (bool, optional): Defaults to False.
             When True, the next cycle will not be started before midnight.
-            Typically, this is used in cases with limited number of service calls 
+            Typically, this is used in cases with limited number of service calls
             where the daily quota has been exceeded.
     """
     global cfg
 
     if waitUntilMidnight:
         tNow = datetime.datetime.now()
-        waitTimeSec = 24 * 60 * 60 - (
-            3600 * tNow.hour + 60 * tNow.minute + tNow.second + tNow.microsecond / 1000000
-        ) + 1
+        waitTimeSec = (
+            24 * 60 * 60
+            - (
+                3600 * tNow.hour
+                + 60 * tNow.minute
+                + tNow.second
+                + tNow.microsecond / 1000000
+            )
+            + 1
+        )
         time.sleep(waitTimeSec)
 
     elif (
@@ -385,7 +400,8 @@ def waitForNextCycle(waitUntilMidnight: bool = False):
             waitTimeSec,
         )
         time.sleep(waitTimeSec)
-        
+
+
 def getFemsSession() -> requests.session:
     """The function initializes a session for subsequent service calls
 
@@ -393,32 +409,33 @@ def getFemsSession() -> requests.session:
         requests.session: Session with authorization
     """
     session = requests.Session()
-    session.auth = (cfg["femsUsername"], cfg["femsPassword"])
-    return session    
+    session.auth = (cfg["emsUsername"], cfg["emsPassword"])
+    return session
 
-def getFemsData(session: requests.Session, femsd: dict) -> dict:
-    """Run a FEMS query and return the result as dictionary
-    
-    The function uses the given session wth the query URL as specified 
-    in the femsData elements of the configuration file 
+
+def getEmsData(session: requests.Session, emsd: dict) -> dict:
+    """Run an OpenEMS query and return the result as dictionary
+
+    The function uses the given session wth the query URL as specified
+    in the emsData elements of the configuration file
 
     Args:
-        session (requests.Session): 
+        session (requests.Session):
             session object to be used for query
-        femsd (dict): 
-            An element of the femsData list of the configuration file.
+        emsd (dict):
+            An element of the emsData list of the configuration file.
             The URL needs to be specified in element "query"
 
     Raises:
         FemsAccessError:
-            An error occurred when accessing FEMS or when transforming
+            An error occurred when accessing OpenEMS or when transforming
             the JSON result to dictionary
 
     Returns:
         dict: Dictionary with query results
     """
-   
-    url = cfg["femsURL"] + femsd["query"]
+
+    url = cfg["emsURL"] + emsd["query"]
     try:
         response = session.get(url)
         response.raise_for_status()
@@ -434,18 +451,19 @@ def getFemsData(session: requests.Session, femsd: dict) -> dict:
         raise FemsAccessError
     return respDict
 
+
 def getTagsFromKey(key: str, tpl: str, tags: dict) -> dict:
-    """Analyze a given FEMS key and return a dictionary of Influx tags
-    
+    """Analyze a given OpenEMS key and return a dictionary of Influx tags
+
     The analysis of the key is done using the given template.
-    Keys may be either EMS Component IDs or Channel-IDs, which are part of the 
+    Keys may be either EMS Component IDs or Channel-IDs, which are part of the
     URL for the REST endpoint of an EMS datapoint.
     For example for the address
     battery0/Tower0Module0Cell009Voltage
     we have
     - Component ID: battery0
     - Channel-ID  : Tower0Module0Cell009Voltage
-    
+
     Using the template
                     Tower?Module?Cell???
     Will result in the tag dictionary:
@@ -461,7 +479,7 @@ def getTagsFromKey(key: str, tpl: str, tags: dict) -> dict:
 
     Returns:
         dict: Extended dictionary of tags
-    """    
+    """
     keyRem = key
     tplRem = tpl
     if len(keyRem) < len(tplRem):
@@ -474,12 +492,12 @@ def getTagsFromKey(key: str, tpl: str, tags: dict) -> dict:
             p2 = p1 + 1
             done = False
             while not done and p2 <= len(tplRem):
-                if tplRem[p2-1:p2] != "?":
+                if tplRem[p2 - 1 : p2] != "?":
                     done = True
                 else:
                     if p2 == len(tplRem):
                         done = True
-                    elif tplRem[p2:p2 + 1] != "?":
+                    elif tplRem[p2 : p2 + 1] != "?":
                         done = True
                     else:
                         p2 += 1
@@ -495,93 +513,97 @@ def getTagsFromKey(key: str, tpl: str, tags: dict) -> dict:
             allDone = True
     return tags
 
-def storeFemsData(influxWriteAPI, frd: dict, femsd: dict):
-    """Storedata from a FEMS query as measurements in Influx
-    
+
+def storeEmsData(influxWriteAPI, frd: dict, emsd: dict):
+    """Store data from an OpenEMS query as measurements in Influx
+
+    For openEMS REST API, see:
+    https://github.com/OpenEMS/openems/tree/develop/io.openems.edge.controller.api.rest
+
     Queries are typically done uing regular expressions and will, therefore,
     include multiple results.
     This function iterates the results and and filters them with respect to
     the configuration specified for the specific query.
-    
-    FEMS datapoints are either used as tags (e.g. "SerialNumber") or as Influx fields
-    Field names are obtained from the FEMS Channel-Id, starting after the configured
+
+    OpenEMS datapoints are either used as tags (e.g. "SerialNumber") or as Influx fields
+    Field names are obtained from the OpenEMS Channel-Id, starting after the configured
     "channel_root".
-    Only FEMS datapoints are considered for which the field name is in the list of
+    Only OpenEMS datapoints are considered for which the field name is in the list of
     configured "field_datapoints".
-    Tags are obtained from the FEMS Component-ID and that part of the Channel-ID 
+    Tags are obtained from the OpenEMS Component-ID and that part of the Channel-ID
     which corresponds to the configured "channel_root".
-    Tags from "tag_datapoints" (e.g. "SerialNumber") are never considered as part 
+    Tags from "tag_datapoints" (e.g. "SerialNumber") are never considered as part
     of a measurement key.
     Measurement keys are only obtained from the tag-concatenations resulting from
-    FEMS Component-IDs and Channel-IDs.
-    
-    In a first step all FEMS datapoints are analyzed and, if a valid datapoint
+    OpenEMS Component-IDs and Channel-IDs.
+
+    In a first step all OpenEMS datapoints are analyzed and, if a valid datapoint
     is found, it field (key:value) is added to a measurement with the same key,
     resulting from the concatenation of the identifying tags.
-    
+
     Finally, the list of measurements is written to Influx and/or to a csv File.
 
     Args:
         influxWriteAPI: Influx write_api object
-        frd (dict): FEMS request data from 
-        femsd (dict): [description]
+        frd (dict): OpenEMS request data from
+        emsd (dict): [description]
     """
-    csvFile = cfg["csvDir"] + femsd["csvFile"]
+    csvFile = cfg["csvDir"] + emsd["csvFile"]
     sep = ";"
 
-    if "tag_datapoints" in femsd:
-        tagDp = femsd["tag_datapoints"]
+    if "tag_datapoints" in emsd:
+        tagDp = emsd["tag_datapoints"]
     else:
         tagDp = {}
     nrTagDp = len(tagDp)
-    fieldDp = femsd["field_datapoints"]
+    fieldDp = emsd["field_datapoints"]
     nrFieldDp = len(fieldDp)
-    dpStart = len(femsd["channel_root"]) - 1
-    
+    dpStart = len(emsd["channel_root"]) - 1
+
     pointDict = {}
-    
+
     for el in frd:
         addr = el["address"]
         p = addr.find("/")
         comp = addr[0:p]
-        chan = addr[p+1:]
+        chan = addr[p + 1 :]
         type = el["type"]
         unit = el["unit"]
         value = el["value"]
-        
+
         dpName = chan[dpStart:]
 
-        #Get tags from component
+        # Get tags from component
         tags = {}
-        tags = getTagsFromKey(comp, femsd["component"][1:], tags)
-        
-        #Get tags from channel
-        tags = getTagsFromKey(chan, femsd["channel_root"][1:], tags)
-            
-        #Datapoint key is a unique set of tags from FEMS datapoint keys
+        tags = getTagsFromKey(comp, emsd["component"][1:], tags)
+
+        # Get tags from channel
+        tags = getTagsFromKey(chan, emsd["channel_root"][1:], tags)
+
+        # Datapoint key is a unique set of tags from OpenEMS datapoint keys
         pointKey = ""
         for tagKey, tagValue in tags.items():
             pointKey += str(tagValue)
         if pointKey == "":
             pointKey = "#EMPTY#"
-            
+
         if pointKey in pointDict:
             point = pointDict[pointKey]
         else:
             point = {}
-            point["measurement"] = femsd["measurement"]
+            point["measurement"] = emsd["measurement"]
             point["time"] = mTS
             point["tags"] = tags
             point["fields"] = {}
             pointDict[pointKey] = point
-        
-        #Get tag from datapoint
+
+        # Get tag from datapoint
         for i in range(nrTagDp):
             dp = tagDp[i]
             if dp == dpName:
                 point["tags"][dp] = value
                 break
-        
+
         for i in range(nrFieldDp):
             dp = fieldDp[i]
             if dp == dpName:
@@ -605,7 +627,7 @@ def storeFemsData(influxWriteAPI, frd: dict, femsd: dict):
         if len(point["fields"]) > 0:
             if cfg["InfluxOutput"] == True:
                 influxWriteAPI.write(cfg["InfluxBucket"], cfg["InfluxOrg"], point)
-                logger.debug("FEMS data written to Influx DB for key %s", pointKey)
+                logger.debug("EMS data written to Influx DB for key %s", pointKey)
             if cfg["csvOutput"] == True:
                 title = "_measureemnt" + sep + "_time"
                 if len(point["tags"]) > 0:
@@ -625,7 +647,7 @@ def storeFemsData(influxWriteAPI, frd: dict, femsd: dict):
                         data = data + sep
                 data = data + "\n"
                 writeCsv(csvFile, title, data)
-                logger.debug("FEMS data written to csv file for key %s", pointKey)
+                logger.debug("EMS data written to csv file for key %s", pointKey)
 
 
 def writeCsv(fp, title, data):
@@ -657,7 +679,7 @@ def writeCsv(fp, title, data):
 getCl()
 
 logger.info("=============================================================")
-logger.info("monitorFems started")
+logger.info("monitorEMS started")
 logger.info("=============================================================")
 
 # Get configuration
@@ -703,7 +725,7 @@ while not stop:
         noWait = False
         waitUntilMidnight = False
 
-        logger.info("monitorFems - cycle started")
+        logger.info("monitorEMS - cycle started")
         local_datetime = datetime.datetime.now()
         local_datetime_timestamp = round(local_datetime.timestamp())
         UTC_datetime_converted = datetime.datetime.utcfromtimestamp(
@@ -713,20 +735,20 @@ while not stop:
 
         session = getFemsSession()
 
-        if "femsData" in cfg:
-            fd = cfg["femsData"]
+        if "emsData" in cfg:
+            fd = cfg["emsData"]
             for fde in fd:
-                fmsd = getFemsData(session, fde)
-                storeFemsData(influxWriteAPI, fmsd, fde)
+                fmsd = getEmsData(session, fde)
+                storeEmsData(influxWriteAPI, fmsd, fde)
 
-        logger.info("monitorFems - cycle completed")
+        logger.info("monitorEMS - cycle completed")
 
         if testRun:
             # Stop in case of test run
             stop = True
 
     except FemsAccessError:
-        logger.info("No access to FEMS")
+        logger.info("No access to EMS")
         stop = False
         noWait = False
 
@@ -753,5 +775,5 @@ if influxClient:
 if influxWriteAPI:
     del influxWriteAPI
 logger.info("=============================================================")
-logger.info("monitorFems terminated")
+logger.info("monitorEMS terminated")
 logger.info("=============================================================")

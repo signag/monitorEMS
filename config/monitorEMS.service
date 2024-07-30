@@ -1,0 +1,14 @@
+[Unit]
+Description=monitorEMS
+After=network.target
+
+[Service]
+ExecStart=/home/<user>/prg/monitorEMS/.venv/bin/python -u monitorEMS.py -s
+WorkingDirectory=/home/<user>/prg/monitorEMS/monitorEMS
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=<user>
+
+[Install]
+WantedBy=multi-user.target

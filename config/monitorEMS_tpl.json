@@ -1,23 +1,23 @@
 {
     "measurementInterval": 120,
-    "femsURL": "http://femsxxxxx:80",
-    "femsUsername": "x",
-    "femsPassword": "user",
+    "emsURL": "http://femsxxxxx:80",
+    "emsUsername": "x",
+    "emsPassword": "user",
     "InfluxOutput": true,
     "InfluxURL": "",
     "InfluxOrg": "",
     "InfluxToken": "",
-    "InfluxBucket": "FEMS",
+    "InfluxBucket": "EMS",
     "csvOutput": false,
     "csvDir": "",
-    "femsData": [
+    "emsData": [
         {
-            "measurement": "fems_sum",
+            "measurement": "ems_sum",
             "port": 80,
             "url": "/rest/channel",
             "component": "/_sum",
             "channel_root": "/",
-            "csvFile": "monitorFems_sum.csv",
+            "csvFile": "monitorEMS_sum.csv",
             "query": "/rest/channel/_sum/[CEGP].*",
             "tag_datapoints": [],
             "field_datapoints": [
@@ -41,12 +41,12 @@
             ]
         },
         {
-            "measurement": "fems_battery",
+            "measurement": "ems_battery",
             "port": 80,
             "url": "/rest/channel",
             "component": "/battery?",
             "channel_root": "/",
-            "csvFile": "monitorFems_battery.csv",
+            "csvFile": "monitorEMS_battery.csv",
             "query": "/rest/channel/battery\\d{1}/[CMNRV].*",
             "tag_datapoints": [],
             "field_datapoints": [
@@ -60,12 +60,12 @@
             ]
         },
         {
-            "measurement": "fems_battery_towers",
+            "measurement": "ems_battery_towers",
             "port": 80,
             "url": "/rest/channel",
             "component": "/battery?",
             "channel_root": "/Tower?",
-            "csvFile": "monitorFems_battery_towers.csv",
+            "csvFile": "monitorEMS_battery_towers.csv",
             "query": "/rest/channel/battery\\d{1}/Tower\\d{1}[ABCNRSUV].*",
             "tag_datapoints": [],
             "field_datapoints": [
@@ -85,12 +85,12 @@
             ]
         },
         {
-            "measurement": "fems_battery_modules",
+            "measurement": "ems_battery_modules",
             "port": 80,
             "url": "/rest/channel",
             "component": "/battery?",
             "channel_root": "/Tower?Module?",
-            "csvFile": "monitorFems_battery_modules.csv",
+            "csvFile": "monitorEMS_battery_modules.csv",
             "query": "/rest/channel/battery\\d{1}/Tower\\d{1}Module\\d{1}[ST].*",
             "tag_datapoints": [
                 "SerialNumber"
@@ -102,36 +102,36 @@
             ]
         },
         {
-            "measurement": "fems_battery_cells",
+            "measurement": "ems_battery_cells",
             "port": 80,
             "url": "/rest/channel",
             "component": "/battery?",
             "channel_root": "/Tower?Module?Cell???",
-            "csvFile": "monitorFems_battery_cells.csv",
+            "csvFile": "monitorEMS_battery_cells.csv",
             "query": "/rest/channel/battery\\d{1}/Tower\\d{1}Module\\d{1}Cell\\d{3}V.*",
             "field_datapoints": [
                 "Voltage"
             ]
         },
         {
-            "measurement": "fems_heating_element",
+            "measurement": "ems_heating_element",
             "port": 80,
             "url": "/rest/channel",
             "component": "/ctrlIoHeatingElement?",
             "channel_root": "/",
-            "csvFile": "monitorFems_heating_element.csv",
+            "csvFile": "monitorEMS_heating_element.csv",
             "query": "/rest/channel/ctrlIoHeatingElement\\d{1}/L.*",
             "field_datapoints": [
                 "Level"
             ]
         },
         {
-            "measurement": "fems_heatpump",
+            "measurement": "ems_heatpump",
             "port": 80,
             "url": "/rest/channel",
             "component": "/ctrlIoHeatPump?",
             "channel_root": "/",
-            "csvFile": "monitorFems_heatpump.csv",
+            "csvFile": "monitorEMS_heatpump.csv",
             "query": "/rest/channel/ctrlIoHeatPump\\d{1}/S.*",
             "field_datapoints": [
                 "State"
