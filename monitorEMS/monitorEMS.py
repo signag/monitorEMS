@@ -78,7 +78,7 @@ def getCl():
 
     If not otherwises specified on the command line, a configuration file
        monitorEMS.json
-    will be searched sequentially under ./tests/data, $HOME/.config or /etc.
+    will be searched sequentially under ./tests/data, ./config, $HOME/.config or /etc.
 
     This configuration file specifies credentials for EMS access,
     the data to read, the connection to the InfluxDB and other runtime parameters.
