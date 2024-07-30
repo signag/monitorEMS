@@ -1,0 +1,11 @@
+certifi==2024.7.4
+charset-normalizer==3.3.2
+idna==3.7
+influxdb_client==1.44.0
+logging-plus==1.1.2
+python-dateutil==2.9.0.post0
+reactivex==4.0.4
+requests==2.32.3
+six==1.16.0
+typing_extensions==4.12.2
+urllib3==2.2.2
