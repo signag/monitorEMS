@@ -30,7 +30,7 @@ testRun = False
 servRun = False
 
 
-class FemsAccessError(Exception):
+class EmsAccessError(Exception):
     pass
 
 
@@ -427,7 +427,7 @@ def getEmsData(session: requests.Session, emsd: dict) -> dict:
             The URL needs to be specified in element "query"
 
     Raises:
-        FemsAccessError:
+        EmsAccessError:
             An error occurred when accessing OpenEMS or when transforming
             the JSON result to dictionary
 
@@ -442,13 +442,13 @@ def getEmsData(session: requests.Session, emsd: dict) -> dict:
         respDict = json.loads(response.text)
     except requests.exceptions.HTTPError as e:
         logger.error("Error getting _sum data: %s", e)
-        raise FemsAccessError
+        raise EmsAccessError
     except requests.exceptions.RequestException as e:
         logger.error("Error getting _sum data: %s", e)
-        raise FemsAccessError
+        raise EmsAccessError
     except Exception as e:
         logger.error("Error getting _sum data: %s", e)
-        raise FemsAccessError
+        raise EmsAccessError
     return respDict
 
 
@@ -712,13 +712,12 @@ waitUntilMidnight = False
 stop = False
 failcount = 0
 loggedIn = False
-vwc = None
 newLoginMax = math.floor(3599 / cfg["measurementInterval"])
 newLoginCount = 0
 
 while not stop:
     try:
-        # Wait unless noWait is set in case of VWError.
+        # Wait unless noWait is set in case of an exception.
         # Skip waiting for test run
         if not noWait and not testRun:
             waitForNextCycle(waitUntilMidnight)
@@ -747,7 +746,7 @@ while not stop:
             # Stop in case of test run
             stop = True
 
-    except FemsAccessError:
+    except EmsAccessError:
         logger.info("No access to EMS")
         stop = False
         noWait = False
@@ -755,8 +754,6 @@ while not stop:
     except Exception as error:
         stop = True
         logger.critical("Unexpected Exception: %s", error)
-        if vwc:
-            del vwc
         if influxClient:
             del influxClient
         if influxWriteAPI:

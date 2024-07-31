@@ -1,0 +1,586 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": {
+                    "type": "grafana",
+                    "uid": "-- Grafana --"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 41,
+    "links": [
+        {
+            "asDropdown": false,
+            "icon": "external link",
+            "includeVars": false,
+            "keepTime": true,
+            "tags": [
+                "EMS"
+            ],
+            "targetBlank": false,
+            "title": "New link",
+            "tooltip": "",
+            "type": "dashboards",
+            "url": ""
+        }
+    ],
+    "panels": [
+        {
+            "collapsed": false,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            },
+            "id": 3,
+            "panels": [],
+            "title": "Battery Overview",
+            "type": "row"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "Wivf-yM4z"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "left",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 8,
+                "x": 0,
+                "y": 1
+            },
+            "id": 2,
+            "options": {
+                "cellHeight": "sm",
+                "footer": {
+                    "countRows": false,
+                    "fields": "",
+                    "reducer": [
+                        "sum"
+                    ],
+                    "show": false
+                },
+                "showHeader": false
+            },
+            "pluginVersion": "11.1.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "Wivf-yM4z"
+                    },
+                    "query": "import \"date\"\r\nstop = v.timeRangeStop\r\nstart = date.sub(from: stop, d: 1d)\r\nfrom(bucket: \"EMS\")\r\n  |> range(start: start, stop: stop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery\" or (r[\"_measurement\"] == \"ems_battery_towers\" and r[\"Tower\"] == \"0\"))\r\n  |> sort(columns: [\"_time\"])\r\n  |> tail(n: 1)\r\n  |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\"])\r\n  |> map(fn: (r) => ({r with val: string(v: r[\"_value\"])}))\r\n  |> drop(columns: [\"_value\"])\r\n  |> group()\r\n  |> filter(fn: (r) => \r\n         r[\"_field\"] == \"BmsSerialNumber\" \r\n      or r[\"_field\"] == \"BmsSoftwareVersion\"\r\n      or r[\"_field\"] == \"Capacity\"\r\n      or r[\"_field\"] == \"NumberOfModulesPerTower\"\r\n      or r[\"_field\"] == \"NumberOfTowers\"\r\n      or r[\"_field\"] == \"RackNumberOfCellsInSeriesPerModule\"\r\n  )\r\n",
+                    "refId": "A"
+                }
+            ],
+            "title": "Battery Info",
+            "type": "table"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "Wivf-yM4z"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "left",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 8,
+                "y": 1
+            },
+            "id": 1,
+            "options": {
+                "cellHeight": "sm",
+                "footer": {
+                    "countRows": false,
+                    "fields": "",
+                    "reducer": [
+                        "sum"
+                    ],
+                    "show": false
+                },
+                "showHeader": false
+            },
+            "pluginVersion": "11.1.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "Wivf-yM4z"
+                    },
+                    "query": "import \"date\"\r\nstop = v.timeRangeStop\r\nstart = date.sub(from: stop, d: 1d)\r\nfrom(bucket: \"EMS\")\r\n  |> range(start: start, stop: stop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery\" or (r[\"_measurement\"] == \"ems_battery_towers\" and r[\"Tower\"] == \"0\"))\r\n  |> sort(columns: [\"_time\"])\r\n  |> tail(n: 1)\r\n  |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\"])\r\n  |> map(fn: (r) => ({r with val: string(v: r[\"_value\"])}))\r\n  |> drop(columns: [\"_value\"])\r\n  |> group()\r\n  |> filter(fn: (r) => \r\n         r[\"_field\"] == \"AvarageCellVoltage\" \r\n      or r[\"_field\"] == \"MaxCellVoltage\"\r\n      or r[\"_field\"] == \"MinCellVoltage\"\r\n      or r[\"_field\"] == \"NoOfCycles\"\r\n      or r[\"_field\"] == \"RemainingCapacity\"\r\n      or r[\"_field\"] == \"UsableCapacity\"\r\n      or r[\"_field\"] == \"Soh\"\r\n  )",
+                    "refId": "A"
+                }
+            ],
+            "title": "Battery Status",
+            "type": "table"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "Wivf-yM4z"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "max": 100,
+                    "min": 0,
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "red",
+                                "value": null
+                            },
+                            {
+                                "color": "#EAB839",
+                                "value": 20
+                            },
+                            {
+                                "color": "green",
+                                "value": 50
+                            }
+                        ]
+                    },
+                    "unit": "percent"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 3,
+                "x": 15,
+                "y": 1
+            },
+            "id": 4,
+            "options": {
+                "minVizHeight": 75,
+                "minVizWidth": 75,
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "sizing": "auto"
+            },
+            "pluginVersion": "11.1.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "Wivf-yM4z"
+                    },
+                    "query": "import \"date\"\r\nstop = v.timeRangeStop\r\nstart = date.sub(from: stop, d: 1d)\r\nfrom(bucket: \"EMS\")\r\n  |> range(start: start, stop: stop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\" and r[\"_field\"] == \"Soc\")\r\n  |> sort(columns: [\"_time\"])\r\n  |> tail(n: 1)\r\n  |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\"])\r\n",
+                    "refId": "A"
+                }
+            ],
+            "title": "State of Charge",
+            "type": "gauge"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "Wivf-yM4z"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "max": 350,
+                    "min": 300,
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "dark-purple",
+                                "value": null
+                            }
+                        ]
+                    },
+                    "unit": "volt"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 3,
+                "x": 18,
+                "y": 1
+            },
+            "id": 5,
+            "options": {
+                "minVizHeight": 75,
+                "minVizWidth": 75,
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "sizing": "auto"
+            },
+            "pluginVersion": "11.1.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "Wivf-yM4z"
+                    },
+                    "query": "import \"date\"\r\nstop = v.timeRangeStop\r\nstart = date.sub(from: stop, d: 1d)\r\nfrom(bucket: \"EMS\")\r\n  |> range(start: start, stop: stop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\" and r[\"_field\"] == \"Voltage\")\r\n  |> sort(columns: [\"_time\"])\r\n  |> tail(n: 1)\r\n  |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\"])\r\n",
+                    "refId": "A"
+                }
+            ],
+            "title": "Voltage",
+            "type": "gauge"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "Wivf-yM4z"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "max": 20,
+                    "min": -20,
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "super-light-blue",
+                                "value": null
+                            },
+                            {
+                                "color": "dark-blue",
+                                "value": 0
+                            }
+                        ]
+                    },
+                    "unit": "amp"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 3,
+                "x": 21,
+                "y": 1
+            },
+            "id": 6,
+            "options": {
+                "minVizHeight": 75,
+                "minVizWidth": 75,
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "sizing": "auto"
+            },
+            "pluginVersion": "11.1.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "Wivf-yM4z"
+                    },
+                    "query": "import \"date\"\r\nstop = v.timeRangeStop\r\nstart = date.sub(from: stop, d: 1d)\r\nfrom(bucket: \"EMS\")\r\n  |> range(start: start, stop: stop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\" and r[\"_field\"] == \"Current\")\r\n  |> sort(columns: [\"_time\"])\r\n  |> tail(n: 1)\r\n  |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\"])\r\n",
+                    "refId": "A"
+                }
+            ],
+            "title": "Current",
+            "type": "gauge"
+        },
+        {
+            "collapsed": false,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 9
+            },
+            "id": 7,
+            "panels": [],
+            "title": "Modules",
+            "type": "row"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "Wivf-yM4z"
+            },
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "auto",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Temperature"
+                        },
+                        "properties": [
+                            {
+                                "id": "unit",
+                                "value": "celsius"
+                            },
+                            {
+                                "id": "custom.cellOptions",
+                                "value": {
+                                    "mode": "gradient",
+                                    "type": "gauge"
+                                }
+                            },
+                            {
+                                "id": "thresholds",
+                                "value": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "orange",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 30
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "min",
+                                "value": 15
+                            },
+                            {
+                                "id": "max",
+                                "value": 40
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Voltage"
+                        },
+                        "properties": [
+                            {
+                                "id": "unit",
+                                "value": "volt"
+                            },
+                            {
+                                "id": "custom.cellOptions",
+                                "value": {
+                                    "mode": "gradient",
+                                    "type": "gauge"
+                                }
+                            },
+                            {
+                                "id": "min",
+                                "value": 40
+                            },
+                            {
+                                "id": "max",
+                                "value": 50
+                            },
+                            {
+                                "id": "thresholds",
+                                "value": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "dark-purple",
+                                            "value": null
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Module"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width",
+                                "value": 80
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "SerialNumber"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 15,
+                "x": 0,
+                "y": 10
+            },
+            "id": 8,
+            "options": {
+                "cellHeight": "sm",
+                "footer": {
+                    "countRows": false,
+                    "fields": "",
+                    "reducer": [
+                        "sum"
+                    ],
+                    "show": false
+                },
+                "showHeader": true
+            },
+            "pluginVersion": "11.1.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "Wivf-yM4z"
+                    },
+                    "query": "import \"date\"\r\nimport \"math\"\r\nimport \"join\"\r\nstop = v.timeRangeStop\r\nstart = date.sub(from: stop, d: 1d)\r\ncv =\r\n  from(bucket: \"EMS\")\r\n    |> range(start: start, stop: stop)\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_cells\" and r[\"_field\"] == \"Voltage\")\r\n    |> sort(columns: [\"_time\"])\r\n    |> tail(n: 1)\r\n    |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\"])\r\n    |> sort(columns: [\"_Module\"])\r\n    |> group(columns: [\"Module\"])\r\n    |> sum()\r\n    |> map(fn: (r) => ({r with Voltage: float(v: r._value)/1000.0}))\r\n    |> drop(columns: [\"_value\"])\r\n    |> group()\r\n\r\nmt =\r\n  from(bucket: \"EMS\")\r\n    |> range(start: start, stop: stop)\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_modules\")\r\n    |> sort(columns: [\"_time\"])\r\n    |> tail(n: 1)\r\n    |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\"])\r\n    |> sort(columns: [\"_Module\"])\r\n    |> group(columns: [\"Module\"])\r\n    |> mean()\r\n    |> map(fn: (r) => ({r with Temperature: math.round(x: r._value * 10.0) / 100.0}))\r\n    |> drop(columns: [\"_value\"])\r\n    |> group()\r\n\r\nms =\r\n  from(bucket: \"EMS\")\r\n    |> range(start: start, stop: stop)\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_modules\")\r\n    |> sort(columns: [\"_time\"])\r\n    |> tail(n: 1)\r\n    |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\", \"_field\", \"_value\"])\r\n    |> sort(columns: [\"_Module\"])\r\n    |> tail(n: 1)\r\n    |> group()\r\n\r\nmst =\r\n    join.inner(left: ms, \r\n               right: mt, \r\n               on: (l, r) => l.Module == r.Module,\r\n               as: (l, r) => ({l with Temperature: r.Temperature}) \r\n              )\r\n\r\nmstv =\r\n    join.inner(left: mst, \r\n               right: cv, \r\n               on: (l, r) => l.Module == r.Module,\r\n               as: (l, r) => ({l with Voltage: r.Voltage}) \r\n              )\r\nmstv",
+                    "refId": "A"
+                }
+            ],
+            "title": "Modules (In stacking sequence top: 0)",
+            "type": "table"
+        }
+    ],
+    "refresh": "1m",
+    "schemaVersion": 39,
+    "tags": [
+        "EMS"
+    ],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now/d",
+        "to": "now/d"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "EMS Battery Overview",
+    "uid": "ddt0r6o19l69sb",
+    "version": 29,
+    "weekStart": ""
+}

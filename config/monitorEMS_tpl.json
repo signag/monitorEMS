@@ -13,8 +13,6 @@
     "emsData": [
         {
             "measurement": "ems_sum",
-            "port": 80,
-            "url": "/rest/channel",
             "component": "/_sum",
             "channel_root": "/",
             "csvFile": "monitorEMS_sum.csv",
@@ -42,8 +40,6 @@
         },
         {
             "measurement": "ems_battery",
-            "port": 80,
-            "url": "/rest/channel",
             "component": "/battery?",
             "channel_root": "/",
             "csvFile": "monitorEMS_battery.csv",
@@ -61,8 +57,6 @@
         },
         {
             "measurement": "ems_battery_towers",
-            "port": 80,
-            "url": "/rest/channel",
             "component": "/battery?",
             "channel_root": "/Tower?",
             "csvFile": "monitorEMS_battery_towers.csv",
@@ -86,8 +80,6 @@
         },
         {
             "measurement": "ems_battery_modules",
-            "port": 80,
-            "url": "/rest/channel",
             "component": "/battery?",
             "channel_root": "/Tower?Module?",
             "csvFile": "monitorEMS_battery_modules.csv",
@@ -103,8 +95,6 @@
         },
         {
             "measurement": "ems_battery_cells",
-            "port": 80,
-            "url": "/rest/channel",
             "component": "/battery?",
             "channel_root": "/Tower?Module?Cell???",
             "csvFile": "monitorEMS_battery_cells.csv",
@@ -115,8 +105,6 @@
         },
         {
             "measurement": "ems_heating_element",
-            "port": 80,
-            "url": "/rest/channel",
             "component": "/ctrlIoHeatingElement?",
             "channel_root": "/",
             "csvFile": "monitorEMS_heating_element.csv",
@@ -127,8 +115,6 @@
         },
         {
             "measurement": "ems_heatpump",
-            "port": 80,
-            "url": "/rest/channel",
             "component": "/ctrlIoHeatPump?",
             "channel_root": "/",
             "csvFile": "monitorEMS_heatpump.csv",
