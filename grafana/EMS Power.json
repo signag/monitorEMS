@@ -38,8 +38,7 @@
     "panels": [
         {
             "datasource": {
-                "type": "influxdb",
-                "uid": "Wivf-yM4z"
+                "type": "influxdb"
             },
             "fieldConfig": {
                 "defaults": {
@@ -287,8 +286,7 @@
             "targets": [
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
                     "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"GridActivePower\") \r\n  |> map(fn: (r) => ({r with _value: if r._value < 0 then -1 * r._value else 0}))\r\n",
@@ -296,16 +294,14 @@
                 },
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ProductionActivePower\" or r[\"_field\"] == \"ConsumptionActivePower\") \r\n",
                     "refId": "A"
                 },
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
                     "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"GridActivePower\") \r\n  |> map(fn: (r) => ({r with _value: if r._value > 0 then r._value else 0}))\r\n",
@@ -313,8 +309,7 @@
                 },
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
                     "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"EssDischargePower\") \r\n  |> map(fn: (r) => ({r with _value: if r._value > 0 then r._value else 0}))\r\n",
@@ -322,8 +317,7 @@
                 },
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
                     "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"EssDischargePower\") \r\n  |> map(fn: (r) => ({r with _value: if r._value < 0 then -1 * r._value else 0}))\r\n",
@@ -331,8 +325,7 @@
                 },
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
                     "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"EssSoc\") \r\n",
@@ -345,8 +338,7 @@
         },
         {
             "datasource": {
-                "type": "influxdb",
-                "uid": "Wivf-yM4z"
+                "type": "influxdb"
             },
             "fieldConfig": {
                 "defaults": {
@@ -539,8 +531,7 @@
             "targets": [
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
                     "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ConsumptionActiveEnergy\" or r[\"_field\"] == \"GridSellActiveEnergy\")\r\n  |> increase()\r\n",
@@ -548,8 +539,7 @@
                 },
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
                     "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ProductionActiveEnergy\" or r[\"_field\"] == \"EssDcChargeEnergy\" or r[\"_field\"] == \"EssDcDischargeEnergy\")\r\n  |> increase()\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> map(fn: (r) => ({r with prod: r.ProductionActiveEnergy + r.EssDcDischargeEnergy - r.EssDcChargeEnergy }))\r\n  |> drop(\r\n      columns: [\r\n        \"_start\",\r\n        \"_stop\",\r\n        \"_measurement\",\r\n        \"ProductionActiveEnergy\",\r\n        \"EssDcChargeEnergy\",\r\n        \"EssDcDischargeEnergy\"\r\n      ],\r\n  )",
@@ -557,8 +547,7 @@
                 },
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
                     "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"GridBuyActiveEnergy\")\r\n  |> increase()\r\n",

@@ -18,7 +18,7 @@
     "editable": false,
     "fiscalYearStartMonth": 0,
     "graphTooltip": 1,
-    "id": 45,
+    "id": 46,
     "links": [
         {
             "asDropdown": false,
@@ -38,8 +38,7 @@
     "panels": [
         {
             "datasource": {
-                "type": "influxdb",
-                "uid": "Wivf-yM4z"
+                "type": "influxdb"
             },
             "description": "",
             "fieldConfig": {
@@ -461,16 +460,14 @@
             "targets": [
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
-                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery\")\r\n  |> filter(fn: (r) => r[\"battery\"] == \"0\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"MaxCellVoltage\" or r[\"_field\"] == \"MinCellVoltage\" or r[\"_field\"] == \"Voltage\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery\")\r\n  |> filter(fn: (r) => r[\"battery\"] == \"${battery}\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"MaxCellVoltage\" or r[\"_field\"] == \"MinCellVoltage\" or r[\"_field\"] == \"Voltage\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
                     "refId": "A"
                 },
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
                     "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"EssSoc\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
@@ -478,47 +475,42 @@
                 },
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
-                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\")\r\n  |> filter(fn: (r) => r[\"Tower\"] == \"0\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Soh\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\")\r\n  |> filter(fn: (r) => r[\"battery\"] == \"${battery}\")\r\n  |> filter(fn: (r) => r[\"Tower\"] == \"${tower}\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Soh\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
                     "refId": "C"
                 },
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
-                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\")\r\n  |> filter(fn: (r) => r[\"Tower\"] == \"0\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"StatusBatteryCharging\")\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> map(fn: (r) => ({r with charging: if r.StatusBatteryCharging == true then 100 else 0}))\r\n  |> drop(\r\n      columns: [\r\n        \"_start\",\r\n        \"_stop\",\r\n        \"_measurement\",\r\n        \"StatusBatteryCharging\",\r\n      ],\r\n  )",
+                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\")\r\n  |> filter(fn: (r) => r[\"battery\"] == \"${battery}\")\r\n  |> filter(fn: (r) => r[\"Tower\"] == \"${tower}\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"StatusBatteryCharging\")\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> map(fn: (r) => ({r with charging: if r.StatusBatteryCharging == true then 100 else 0}))\r\n  |> drop(\r\n      columns: [\r\n        \"_start\",\r\n        \"_stop\",\r\n        \"_measurement\",\r\n        \"StatusBatteryCharging\",\r\n      ],\r\n  )",
                     "refId": "D"
                 },
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
-                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\")\r\n  |> filter(fn: (r) => r[\"Tower\"] == \"0\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"StatusBatteryDischarging\")\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> map(fn: (r) => ({r with discharging: if r.StatusBatteryDischarging == true then 100 else 0}))\r\n  |> drop(\r\n      columns: [\r\n        \"_start\",\r\n        \"_stop\",\r\n        \"_measurement\",\r\n        \"StatusBatteryDischarging\",\r\n      ],\r\n  )",
+                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\")\r\n  |> filter(fn: (r) => r[\"battery\"] == \"${battery}\")\r\n  |> filter(fn: (r) => r[\"Tower\"] == \"${tower}\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"StatusBatteryDischarging\")\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> map(fn: (r) => ({r with discharging: if r.StatusBatteryDischarging == true then 100 else 0}))\r\n  |> drop(\r\n      columns: [\r\n        \"_start\",\r\n        \"_stop\",\r\n        \"_measurement\",\r\n        \"StatusBatteryDischarging\",\r\n      ],\r\n  )",
                     "refId": "E"
                 },
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
-                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\")\r\n  |> filter(fn: (r) => r[\"Tower\"] == \"0\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"StatusBatteryIdle\")\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> map(fn: (r) => ({r with idle: if r.StatusBatteryIdle == true then 100 else 0}))\r\n  |> drop(\r\n      columns: [\r\n        \"_start\",\r\n        \"_stop\",\r\n        \"_measurement\",\r\n        \"StatusBatteryIdle\",\r\n      ],\r\n  )",
+                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\")\r\n  |> filter(fn: (r) => r[\"battery\"] == \"${battery}\")\r\n  |> filter(fn: (r) => r[\"Tower\"] == \"${tower}\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"StatusBatteryIdle\")\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> map(fn: (r) => ({r with idle: if r.StatusBatteryIdle == true then 100 else 0}))\r\n  |> drop(\r\n      columns: [\r\n        \"_start\",\r\n        \"_stop\",\r\n        \"_measurement\",\r\n        \"StatusBatteryIdle\",\r\n      ],\r\n  )",
                     "refId": "F"
                 },
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
-                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\")\r\n  |> filter(fn: (r) => r[\"Tower\"] == \"0\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Current\")",
+                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\")\r\n  |> filter(fn: (r) => r[\"battery\"] == \"${battery}\")\r\n  |> filter(fn: (r) => r[\"Tower\"] == \"${tower}\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Current\")",
                     "refId": "G"
                 }
             ],
@@ -527,8 +519,7 @@
         },
         {
             "datasource": {
-                "type": "influxdb",
-                "uid": "Wivf-yM4z"
+                "type": "influxdb"
             },
             "description": "",
             "fieldConfig": {
@@ -760,16 +751,14 @@
             "targets": [
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_modules\")\r\n  |> filter(fn: (r) => r[\"battery\"] == \"$battery\")\r\n  |> filter(fn: (r) => r[\"Tower\"] == \"$tower\")\r\n  |> filter(fn: (r) => r[\"Module\"] == \"$module\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"TemperatureSensor1\" or r[\"_field\"] == \"TemperatureSensor2\" or r[\"_field\"] == \"TemperatureSensor3\")\r\n  |> map(fn: (r) => ({r with _value: float(v: r._value) / 10.0}))\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
                     "refId": "A"
                 },
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
                     "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_cells\")\r\n  |> filter(fn: (r) => r[\"battery\"] == \"${battery}\")\r\n  |> filter(fn: (r) => r[\"Tower\"] == \"${tower}\")\r\n  |> filter(fn: (r) => r[\"Module\"] == \"${module}\")\r\n  |> filter(fn: (r) => if \"$cell\" != \"All\" then r[\"Cell\"] == \"$cell\" else r._measurement != \"\")  \r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> drop(\r\n      columns: [\r\n        \"_start\",\r\n        \"_stop\",\r\n        \"_measurement\",\r\n        \"battery\",\r\n        \"Tower\",\r\n        \"Module\",\r\n      ],\r\n  )\r\n  |> group()\r\n  |> sort(columns: [\"_time\", \"Cell\"])\r\n  |> group(columns: [\"_time\"])\r\n  |> drop(\r\n      columns: [\r\n        \"Cell\",\r\n      ],\r\n  )\r\n  |> max(column: \"Voltage\")\r\n  |> group()\r\n  |> duplicate(column: \"Voltage\", as: \"Voltage Max\")\r\n  |> drop(\r\n      columns: [\r\n          \"Voltage\",\r\n      ],\r\n  )\r\n",
@@ -777,8 +766,7 @@
                 },
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "hide": false,
                     "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_cells\")\r\n  |> filter(fn: (r) => r[\"battery\"] == \"${battery}\")\r\n  |> filter(fn: (r) => r[\"Tower\"] == \"${tower}\")\r\n  |> filter(fn: (r) => r[\"Module\"] == \"${module}\")\r\n  |> filter(fn: (r) => if \"$cell\" != \"All\" then r[\"Cell\"] == \"$cell\" else r._measurement != \"\")  \r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> drop(\r\n      columns: [\r\n        \"_start\",\r\n        \"_stop\",\r\n        \"_measurement\",\r\n        \"battery\",\r\n        \"Tower\",\r\n        \"Module\",\r\n      ],\r\n  )\r\n  |> group()\r\n  |> sort(columns: [\"_time\", \"Cell\"])\r\n  |> group(columns: [\"_time\"])\r\n  |> drop(\r\n      columns: [\r\n        \"Cell\",\r\n      ],\r\n  )\r\n  |> min(column: \"Voltage\")\r\n  |> group()\r\n  |> duplicate(column: \"Voltage\", as: \"Voltage Min\")\r\n  |> drop(\r\n      columns: [\r\n          \"Voltage\",\r\n      ],\r\n  )\r\n",
@@ -798,13 +786,12 @@
         "list": [
             {
                 "current": {
-                    "selected": true,
+                    "selected": false,
                     "text": "0",
                     "value": "0"
                 },
                 "datasource": {
-                    "type": "influxdb",
-                    "uid": "Wivf-yM4z"
+                    "type": "influxdb"
                 },
                 "definition": "import \"influxdata/influxdb/schema\"\r\nschema.tagValues(bucket: \"EMS\", tag: \"battery\", start:1999-01-01T00:00:00Z)",
                 "hide": 0,
@@ -824,13 +811,12 @@
             },
             {
                 "current": {
-                    "selected": true,
+                    "selected": false,
                     "text": "0",
                     "value": "0"
                 },
                 "datasource": {
-                    "type": "influxdb",
-                    "uid": "Wivf-yM4z"
+                    "type": "influxdb"
                 },
                 "definition": "import \"influxdata/influxdb/schema\"\r\nschema.tagValues(bucket: \"EMS\", tag: \"Tower\", start:1999-01-01T00:00:00Z)",
                 "hide": 0,
@@ -850,13 +836,12 @@
             },
             {
                 "current": {
-                    "selected": true,
+                    "selected": false,
                     "text": "0",
                     "value": "0"
                 },
                 "datasource": {
-                    "type": "influxdb",
-                    "uid": "Wivf-yM4z"
+                    "type": "influxdb"
                 },
                 "definition": "import \"influxdata/influxdb/schema\"\r\nschema.tagValues(bucket: \"EMS\", tag: \"Module\", start:1999-01-01T00:00:00Z)",
                 "hide": 0,
@@ -877,13 +862,12 @@
             {
                 "allValue": "All",
                 "current": {
-                    "selected": true,
+                    "selected": false,
                     "text": "All",
                     "value": "$__all"
                 },
                 "datasource": {
-                    "type": "influxdb",
-                    "uid": "Wivf-yM4z"
+                    "type": "influxdb"
                 },
                 "definition": "import \"influxdata/influxdb/schema\"\r\nschema.tagValues(bucket: \"EMS\", tag: \"Cell\", start:1999-01-01T00:00:00Z)",
                 "hide": 0,
@@ -908,8 +892,7 @@
                     "value": "519110001210230131000480"
                 },
                 "datasource": {
-                    "type": "influxdb",
-                    "uid": "Wivf-yM4z"
+                    "type": "influxdb"
                 },
                 "definition": "from(bucket: \"EMS\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"ems_battery_modules\" and\r\n    r.battery == \"${battery}\" and\r\n    r.Tower == \"${tower}\" and\r\n    r.Module == \"${module}\"\r\n  )\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> tail(n: 1)\r\n  |> drop(\r\n      columns: [\r\n        \"_start\",\r\n        \"_stop\",\r\n        \"_measurement\",\r\n        \"_time\",\r\n        \"battery\",\r\n        \"Tower\",\r\n        \"Module\",\r\n        \"TemperatureSensor1\",\r\n        \"TemperatureSensor2\",\r\n        \"TemperatureSensor3\",\r\n      ],\r\n  )\r\n",
                 "hide": 2,

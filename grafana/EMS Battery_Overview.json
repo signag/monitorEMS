@@ -51,8 +51,7 @@
         },
         {
             "datasource": {
-                "type": "influxdb",
-                "uid": "Wivf-yM4z"
+                "type": "influxdb"
             },
             "fieldConfig": {
                 "defaults": {
@@ -106,8 +105,7 @@
             "targets": [
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "query": "import \"date\"\r\nstop = v.timeRangeStop\r\nstart = date.sub(from: stop, d: 1d)\r\nfrom(bucket: \"EMS\")\r\n  |> range(start: start, stop: stop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery\" or (r[\"_measurement\"] == \"ems_battery_towers\" and r[\"Tower\"] == \"0\"))\r\n  |> sort(columns: [\"_time\"])\r\n  |> tail(n: 1)\r\n  |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\"])\r\n  |> map(fn: (r) => ({r with val: string(v: r[\"_value\"])}))\r\n  |> drop(columns: [\"_value\"])\r\n  |> group()\r\n  |> filter(fn: (r) => \r\n         r[\"_field\"] == \"BmsSerialNumber\" \r\n      or r[\"_field\"] == \"BmsSoftwareVersion\"\r\n      or r[\"_field\"] == \"Capacity\"\r\n      or r[\"_field\"] == \"NumberOfModulesPerTower\"\r\n      or r[\"_field\"] == \"NumberOfTowers\"\r\n      or r[\"_field\"] == \"RackNumberOfCellsInSeriesPerModule\"\r\n  )\r\n",
                     "refId": "A"
@@ -118,8 +116,7 @@
         },
         {
             "datasource": {
-                "type": "influxdb",
-                "uid": "Wivf-yM4z"
+                "type": "influxdb"
             },
             "fieldConfig": {
                 "defaults": {
@@ -173,8 +170,7 @@
             "targets": [
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "query": "import \"date\"\r\nstop = v.timeRangeStop\r\nstart = date.sub(from: stop, d: 1d)\r\nfrom(bucket: \"EMS\")\r\n  |> range(start: start, stop: stop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery\" or (r[\"_measurement\"] == \"ems_battery_towers\" and r[\"Tower\"] == \"0\"))\r\n  |> sort(columns: [\"_time\"])\r\n  |> tail(n: 1)\r\n  |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\"])\r\n  |> map(fn: (r) => ({r with val: string(v: r[\"_value\"])}))\r\n  |> drop(columns: [\"_value\"])\r\n  |> group()\r\n  |> filter(fn: (r) => \r\n         r[\"_field\"] == \"AvarageCellVoltage\" \r\n      or r[\"_field\"] == \"MaxCellVoltage\"\r\n      or r[\"_field\"] == \"MinCellVoltage\"\r\n      or r[\"_field\"] == \"NoOfCycles\"\r\n      or r[\"_field\"] == \"RemainingCapacity\"\r\n      or r[\"_field\"] == \"UsableCapacity\"\r\n      or r[\"_field\"] == \"Soh\"\r\n  )",
                     "refId": "A"
@@ -185,8 +181,7 @@
         },
         {
             "datasource": {
-                "type": "influxdb",
-                "uid": "Wivf-yM4z"
+                "type": "influxdb"
             },
             "fieldConfig": {
                 "defaults": {
@@ -243,8 +238,7 @@
             "targets": [
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "query": "import \"date\"\r\nstop = v.timeRangeStop\r\nstart = date.sub(from: stop, d: 1d)\r\nfrom(bucket: \"EMS\")\r\n  |> range(start: start, stop: stop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\" and r[\"_field\"] == \"Soc\")\r\n  |> sort(columns: [\"_time\"])\r\n  |> tail(n: 1)\r\n  |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\"])\r\n",
                     "refId": "A"
@@ -255,8 +249,7 @@
         },
         {
             "datasource": {
-                "type": "influxdb",
-                "uid": "Wivf-yM4z"
+                "type": "influxdb"
             },
             "fieldConfig": {
                 "defaults": {
@@ -305,8 +298,7 @@
             "targets": [
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "query": "import \"date\"\r\nstop = v.timeRangeStop\r\nstart = date.sub(from: stop, d: 1d)\r\nfrom(bucket: \"EMS\")\r\n  |> range(start: start, stop: stop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\" and r[\"_field\"] == \"Voltage\")\r\n  |> sort(columns: [\"_time\"])\r\n  |> tail(n: 1)\r\n  |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\"])\r\n",
                     "refId": "A"
@@ -317,8 +309,7 @@
         },
         {
             "datasource": {
-                "type": "influxdb",
-                "uid": "Wivf-yM4z"
+                "type": "influxdb"
             },
             "fieldConfig": {
                 "defaults": {
@@ -371,8 +362,7 @@
             "targets": [
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "query": "import \"date\"\r\nstop = v.timeRangeStop\r\nstart = date.sub(from: stop, d: 1d)\r\nfrom(bucket: \"EMS\")\r\n  |> range(start: start, stop: stop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_towers\" and r[\"_field\"] == \"Current\")\r\n  |> sort(columns: [\"_time\"])\r\n  |> tail(n: 1)\r\n  |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\"])\r\n",
                     "refId": "A"
@@ -396,8 +386,7 @@
         },
         {
             "datasource": {
-                "type": "influxdb",
-                "uid": "Wivf-yM4z"
+                "type": "influxdb"
             },
             "description": "",
             "fieldConfig": {
@@ -554,8 +543,7 @@
             "targets": [
                 {
                     "datasource": {
-                        "type": "influxdb",
-                        "uid": "Wivf-yM4z"
+                        "type": "influxdb"
                     },
                     "query": "import \"date\"\r\nimport \"math\"\r\nimport \"join\"\r\nstop = v.timeRangeStop\r\nstart = date.sub(from: stop, d: 1d)\r\ncv =\r\n  from(bucket: \"EMS\")\r\n    |> range(start: start, stop: stop)\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_cells\" and r[\"_field\"] == \"Voltage\")\r\n    |> sort(columns: [\"_time\"])\r\n    |> tail(n: 1)\r\n    |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\"])\r\n    |> sort(columns: [\"_Module\"])\r\n    |> group(columns: [\"Module\"])\r\n    |> sum()\r\n    |> map(fn: (r) => ({r with Voltage: float(v: r._value)/1000.0}))\r\n    |> drop(columns: [\"_value\"])\r\n    |> group()\r\n\r\nmt =\r\n  from(bucket: \"EMS\")\r\n    |> range(start: start, stop: stop)\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_modules\")\r\n    |> sort(columns: [\"_time\"])\r\n    |> tail(n: 1)\r\n    |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\"])\r\n    |> sort(columns: [\"_Module\"])\r\n    |> group(columns: [\"Module\"])\r\n    |> mean()\r\n    |> map(fn: (r) => ({r with Temperature: math.round(x: r._value * 10.0) / 100.0}))\r\n    |> drop(columns: [\"_value\"])\r\n    |> group()\r\n\r\nms =\r\n  from(bucket: \"EMS\")\r\n    |> range(start: start, stop: stop)\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"ems_battery_modules\")\r\n    |> sort(columns: [\"_time\"])\r\n    |> tail(n: 1)\r\n    |> drop(columns: [\"_start\", \"_stop\", \"battery\", \"_measurement\", \"_time\", \"Tower\", \"_field\", \"_value\"])\r\n    |> sort(columns: [\"_Module\"])\r\n    |> tail(n: 1)\r\n    |> group()\r\n\r\nmst =\r\n    join.inner(left: ms, \r\n               right: mt, \r\n               on: (l, r) => l.Module == r.Module,\r\n               as: (l, r) => ({l with Temperature: r.Temperature}) \r\n              )\r\n\r\nmstv =\r\n    join.inner(left: mst, \r\n               right: cv, \r\n               on: (l, r) => l.Module == r.Module,\r\n               as: (l, r) => ({l with Voltage: r.Voltage}) \r\n              )\r\nmstv",
                     "refId": "A"
