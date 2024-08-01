@@ -2,14 +2,14 @@
 
 [![Up](img/goup.gif)](../README.md)
 
-This package includes some examples for visualization based on data confígured in the [monitorEMS_tpl.json](./../config/monitorEMS_tpl.json).
+This package includes some examples for visualization based on data confígured in the [monitorEMS_tpl.json](./../config/monitorEMS_tpl.json).     
 [Grafana Setup](GrafanaSetup.md) describes how to set up the dashboards in Grafana.
 
 ## Dashboard EMS Power
 
 ![EMS Power](./img/Dashboard_EMS_Power.jpg)
 
-The upper part of this dashboard is essentially tha same as the standard OpenEMS [Enrgy Monitor](https://github.com/OpenEMS/openems?tab=readme-ov-file#openems-ui-screenshots) dashboard, showing power from production, consumption and storage over time together with the State of Charge of the battery.
+The upper part of this dashboard is essentially the same as the standard OpenEMS [Energy Monitor](https://github.com/OpenEMS/openems?tab=readme-ov-file#openems-ui-screenshots) dashboard, showing power from production, consumption and storage over time together with the State of Charge of the battery.
 
 The lower part shows enrgy over time:    
 Consumed energy and energy fed into the grid are stacked.    

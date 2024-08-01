@@ -23,7 +23,7 @@ For Visualization, some Grafana dashboards are included (see [Visualization](./d
 In order to use the program, you need
 
 - an **Energy Management System**, based on [OpenEMS](https://github.com/OpenEMS/openems)      
-(*monitorEMS* has been developed and tested with a [Fenecon Home 10](https://fenecon.de/fenecon-home-10/) system, running [FEMS](https://fenecon.de/fenecon-fems/))
+(*monitorEMS* has been developed and tested with a [Fenecon Home 10](https://fenecon.de/en/fenecon-home-10/) system, running [FEMS](https://fenecon.de/en/fenecon-fems/))
 - a computer on which [**Docker**](https://www.docker.com/) is running (Windows PC, Linux, e.g. Raspi, NAS, ...), which is available for 24/7 operation.    
 (This project has been deployed on a Synology DS220+ Disk Station)
 - An **Influx DB V2.x** (eventally running as Docker container)
@@ -122,7 +122,7 @@ A template can be found under
 | measurementInterval     | Measurement interval in seconds. (Default: 120)                                       |
 | emsURL                  | URL for EMS. E.g. for FEMS: "http://femsNNNNN:80", where NNNNN is the FEMS-number     |
 | emsUsername             | User name for authentifacion to EMS (usually "x") (see [REST-Api Controller](https://github.com/OpenEMS/openems/tree/develop/io.openems.edge.controller.api.rest#rest-api-controller))|
-| emsPassword             | Password for authentifacion to EMS (usually "user")                                   |
+| emsPassword             | Password for authenticion to EMS (usually "user")                                   |
 | InfluxOutput            | Specifies whether data shall be stored in InfluxDB (Default: false)                   |
 | InfluxURL               | URL for access to Influx DB                                                           |
 | InfluxOrg               | Organization Name specified during InfluxDB installation                              |
@@ -226,7 +226,7 @@ To uniquely identify Tag Keys and Field Keys from Component-IDs and Channel-IDs,
 The examples, below, refer to "ems_battery_cells" measurement from the example, above:
 
 - **"component" pattern**   
-```battery0```
+```battery0```      
 ```battery?```
 - **"channel_root" pattern**   
 ```Tower0Module2Cell012Voltage```    
@@ -236,7 +236,7 @@ Here, the end of the "channel_root" pattern-string marks the begin of the Influx
 ## Running monitorEMS as Python Program
 
 In order to run monitorEMS (or other Python programs of this package) as Python program, proceed as follows:    
-(Python 3.10 or later an Git must have been installed)
+(Python 3.10 or later and Git must have been installed)
 
 | Step | Action                                                                         |
 |------|--------------------------------------------------------------------------------|
@@ -245,7 +245,7 @@ In order to run monitorEMS (or other Python programs of this package) as Python 
 | 3.   | Create and activate virtual Python environment<br>```cd monitorEMS```<br>```python -m venv .venv```<br><br>```.venv\Scripts\activate``` (Windows)<br>```source .venv/bin/activate``` (Linux)  |
 | 4.   | Install necessary programs:<br>```pip install -r requirements.txt``` |
 | 5.   | Start program:<br>```cd monitorEMS```<br>```python monitorEMS.py -h```<br>This should show the usage description (see [Usage](#usage)) |
-| 6.   | Now, you can create a $PARENT/monitorEMS/test data, stage the configuration file and run a test with<br>```python monitorEMS.py -t -v``` |
+| 6.   | Now, you can create a ```$PARENT/monitorEMS/tests/data``` folder, stage the configuration file and run a test with<br>```python monitorEMS.py -t -v``` |
 
 ## Usage
 
