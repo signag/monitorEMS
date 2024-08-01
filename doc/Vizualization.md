@@ -45,3 +45,13 @@ The yellow area shows the spread between minimum and maximum cell voltage within
 The bottom part refers to the selected module, for which the temperatures from the three sensors are drawn.   
 If Cell=All is selected, the yellow area shows the spread between minimum and maximum cell voltage for the selected module.   
 If a specific cell is selected, the voltage for this cell is drawn.
+
+## Battery Monitoring during Extension
+
+The following screenshots show the Battery Time Series dashboard for a day when a tower of a [Fenecon Home 10](https://fenecon.de/en/fenecon-home-10/) system has been extended from 4 to 7 modules, stacking the new modules on top of the old ones, which had already been in use for about two month.
+
+![BatteryExtensionNew](./img/Extension_Dashboard_EMS_BatteryTimeSeries2.jpg)     
+Bottom diagram for new module "0".
+
+![BatteryExtensionNew](./img/Extension_Dashboard_EMS_BatteryTimeSeries.jpg)     
+Bottom diagram for old module "3".
