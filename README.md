@@ -235,6 +235,10 @@ Here, the end of the "channel_root" pattern-string marks the begin of the Influx
 
 ## Running monitorEMS as Python Program
 
+This option should be used when experimenting and testing with configurations for new data points before a configuration is exposed to the Docker container.
+
+The program has especially a -t option for testing which forces a cycle to start immediately without waiting for the configured interval.
+
 In order to run monitorEMS (or other Python programs of this package) as Python program, proceed as follows:    
 (Python 3.10 or later and Git must have been installed)
 
