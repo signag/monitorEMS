@@ -130,7 +130,7 @@ A template can be found under
 | InfluxBucket            | Bucket to be used for storage of EMS data                                             |
 | csvOutput               | Specifies whether EMS data shall be written to a csv file (Default: false)            |
 | csvDir                  | Path to the directory where csv files shall be located                                |
-| **emsData**             | List of configuration sets for Influx measurements to be created.<br>For explanation of the different elements, see [Mapping of OpenEMS to InfluxDB Data Points](#mapping-of-openems-to-influxdb-data-points), below.<br>For an example, see [monitorEMS_tpl.json](./config/monitorEMS_tpl.json).|
+| **emsData**             | List of configuration sets for Influx measurements to be created.<br>For explanation of the different elements, see [Mapping of OpenEMS to InfluxDB Data Points](#mapping-of-openems-to-influxdb-data-points), below.<br>For an example, see [monitorEMS_tpl.json](./config/monitorEMS_tpl.json).<br>See also [How to find Configurations for Data Points Of Interest](#finding-configurations-for-data-points-of-interest).|
 |- measurement            | Influx **Measurement** to be used for data points of this configuration               |
 |- component              | Pattern to be applied to the OpenEMS **Component-ID** to identify Influx **Tag Key** and **Tag Value**<br>e.g. pattern<br>```battery?```, applied to the Component-ID<br>```battery0```,<br>identifies "battery" as Tag Key and "0" as Tag Value.|
 |- channel_root           | Pattern to be applied to the OpenEMS **Channel-ID** to identify Influx **Tag Keys**, **Tag Values** and **Field Keys**<br> e.g. pattern<br>```/Tower?Module?Cell???```, applied to<br>```/Tower0Module3Cell012Voltage```<br> identifues the Influx **Tags** {"Tower": "0", "Module": "3", "Cell": "012" } and "Voltage" as Influx **Field Key**.          |
@@ -283,3 +283,19 @@ usage: monitorEMS.py [-h] [-t] [-s] [-l] [-L] [-F] [-p LOGFILE] [-f FILE] [-v] [
   -c CONFIG, --config CONFIG
                         Path to config file to be used
 ```
+
+## Finding Configurations for Data Points Of Interest
+
+This package includes a small [tryEmsApi.py](./tryEmsApi/tryEmsApi.py) Python program which can be used to evaluate the different OpenEMS REST-API endpoints and the data they disclose.
+
+Before usage, copy this file to $PARENTDIR/tests and name it according to your needs.
+($PARENTDIR/tests is ignored by git)
+
+1. Set 'emsURL' to the URL of your system
+2. Set 'component' to one of the components shown in your OpenEMS configuration
+3. Adjust the name of the 'csvFile' to be produced
+4. Run the program in the [virtual environment for monitorEMS](#running-monitorems-as-python-program).
+   It will create the CSV file under an 'emsOutput' subdirectory.
+5. From the CSV file, select the data points to be monitored
+6. Adjust the regular expression in 'channel' to a more restrictive variant
+7. Use the resulting output to set up an 'emsData' entry in the 'monitorEMS.json' [configuration file](#configuration)
