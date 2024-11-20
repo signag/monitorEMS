@@ -52,6 +52,7 @@
                         "axisLabel": "",
                         "axisPlacement": "auto",
                         "barAlignment": 0,
+                        "barWidthFactor": 0.6,
                         "drawStyle": "line",
                         "fillOpacity": 20,
                         "gradientMode": "opacity",
@@ -283,20 +284,21 @@
                     "sort": "none"
                 }
             },
+            "pluginVersion": "11.3.0",
             "targets": [
                 {
                     "datasource": {
                         "type": "influxdb"
                     },
                     "hide": false,
-                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"GridActivePower\") \r\n  |> map(fn: (r) => ({r with _value: if r._value < 0 then -1 * r._value else 0}))\r\n",
+                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"GridActivePower\") \r\n  |> map(fn: (r) => ({r with _value: if r._value < 0 then -1 * r._value else 0}))\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
                     "refId": "B"
                 },
                 {
                     "datasource": {
                         "type": "influxdb"
                     },
-                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ProductionActivePower\" or r[\"_field\"] == \"ConsumptionActivePower\") \r\n",
+                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ProductionActivePower\" or r[\"_field\"] == \"ConsumptionActivePower\") \r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
                     "refId": "A"
                 },
                 {
@@ -304,7 +306,7 @@
                         "type": "influxdb"
                     },
                     "hide": false,
-                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"GridActivePower\") \r\n  |> map(fn: (r) => ({r with _value: if r._value > 0 then r._value else 0}))\r\n",
+                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"GridActivePower\") \r\n  |> map(fn: (r) => ({r with _value: if r._value > 0 then r._value else 0}))\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
                     "refId": "C"
                 },
                 {
@@ -312,7 +314,7 @@
                         "type": "influxdb"
                     },
                     "hide": false,
-                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"EssDischargePower\") \r\n  |> map(fn: (r) => ({r with _value: if r._value > 0 then r._value else 0}))\r\n",
+                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"EssDischargePower\") \r\n  |> map(fn: (r) => ({r with _value: if r._value > 0 then r._value else 0}))\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
                     "refId": "D"
                 },
                 {
@@ -320,7 +322,7 @@
                         "type": "influxdb"
                     },
                     "hide": false,
-                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"EssDischargePower\") \r\n  |> map(fn: (r) => ({r with _value: if r._value < 0 then -1 * r._value else 0}))\r\n",
+                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"EssDischargePower\") \r\n  |> map(fn: (r) => ({r with _value: if r._value < 0 then -1 * r._value else 0}))\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
                     "refId": "E"
                 },
                 {
@@ -328,7 +330,7 @@
                         "type": "influxdb"
                     },
                     "hide": false,
-                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"EssSoc\") \r\n",
+                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"EssSoc\") \r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
                     "refId": "F"
                 }
             ],
@@ -352,6 +354,7 @@
                         "axisLabel": "",
                         "axisPlacement": "right",
                         "barAlignment": 0,
+                        "barWidthFactor": 0.6,
                         "drawStyle": "line",
                         "fillOpacity": 100,
                         "gradientMode": "opacity",
@@ -528,13 +531,14 @@
                     "sort": "none"
                 }
             },
+            "pluginVersion": "11.3.0",
             "targets": [
                 {
                     "datasource": {
                         "type": "influxdb"
                     },
                     "hide": false,
-                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ConsumptionActiveEnergy\" or r[\"_field\"] == \"GridSellActiveEnergy\")\r\n  |> difference(nonNegative: true)\r\n  |> cumulativeSum()\r\n",
+                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ConsumptionActiveEnergy\" or r[\"_field\"] == \"GridSellActiveEnergy\")\r\n  |> difference(nonNegative: true)\r\n  |> cumulativeSum()\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
                     "refId": "A"
                 },
                 {
@@ -542,7 +546,7 @@
                         "type": "influxdb"
                     },
                     "hide": false,
-                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ProductionActiveEnergy\" or r[\"_field\"] == \"EssDcChargeEnergy\" or r[\"_field\"] == \"EssDcDischargeEnergy\")\r\n  |> difference(nonNegative: true)\r\n  |> cumulativeSum()\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> map(fn: (r) => ({r with prod: r.ProductionActiveEnergy + r.EssDcDischargeEnergy - r.EssDcChargeEnergy }))\r\n  |> drop(\r\n      columns: [\r\n        \"_start\",\r\n        \"_stop\",\r\n        \"_measurement\",\r\n        \"ProductionActiveEnergy\",\r\n        \"EssDcChargeEnergy\",\r\n        \"EssDcDischargeEnergy\"\r\n      ],\r\n  )",
+                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ProductionActiveEnergy\" or r[\"_field\"] == \"EssDcChargeEnergy\" or r[\"_field\"] == \"EssDcDischargeEnergy\")\r\n  |> difference(nonNegative: true)\r\n  |> cumulativeSum()\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> map(fn: (r) => ({r with prod: r.ProductionActiveEnergy + r.EssDcDischargeEnergy - r.EssDcChargeEnergy }))\r\n  |> drop(\r\n      columns: [\r\n        \"_start\",\r\n        \"_stop\",\r\n        \"_measurement\",\r\n        \"ProductionActiveEnergy\",\r\n        \"EssDcChargeEnergy\",\r\n        \"EssDcDischargeEnergy\"\r\n      ],\r\n  )\r\n",
                     "refId": "B"
                 },
                 {
@@ -550,7 +554,7 @@
                         "type": "influxdb"
                     },
                     "hide": false,
-                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"GridBuyActiveEnergy\")\r\n  |> difference(nonNegative: true)\r\n  |> cumulativeSum()\r\n",
+                    "query": "from(bucket: \"EMS\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ems_sum\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"GridBuyActiveEnergy\")\r\n  |> difference(nonNegative: true)\r\n  |> cumulativeSum()\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
                     "refId": "D"
                 }
             ],
@@ -558,8 +562,9 @@
             "type": "timeseries"
         }
     ],
+    "preload": false,
     "refresh": "1m",
-    "schemaVersion": 39,
+    "schemaVersion": 40,
     "tags": [
         "EMS"
     ],
@@ -574,6 +579,6 @@
     "timezone": "browser",
     "title": "EMS Power",
     "uid": "fdsjgd5uore2oa",
-    "version": 3,
+    "version": 14,
     "weekStart": ""
 }
