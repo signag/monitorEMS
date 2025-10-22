@@ -64,7 +64,8 @@
             "tag_datapoints": [],
             "field_datapoints": [
                 "BmsSerialNumber",
-                "BmsSoftwareVersion",
+                "BmsSoftwareVersionMaj",
+                "BmsSoftwareVersionMin",
                 "RemainingCapacity",
                 "UsableCapacity",
                 "NoOfCycles",
