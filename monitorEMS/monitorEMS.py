@@ -711,6 +711,7 @@ noWait = False
 waitUntilMidnight = False
 stop = False
 failcount = 0
+exceptioncount = 0
 loggedIn = False
 newLoginMax = math.floor(3599 / cfg["measurementInterval"])
 newLoginCount = 0
@@ -724,7 +725,7 @@ while not stop:
         noWait = False
         waitUntilMidnight = False
 
-        logger.info("monitorEMS - cycle started")
+        logger.debug("monitorEMS - cycle started")
         local_datetime = datetime.datetime.now()
         local_datetime_timestamp = round(local_datetime.timestamp())
         UTC_datetime_converted = datetime.datetime.utcfromtimestamp(
@@ -740,11 +741,13 @@ while not stop:
                 fmsd = getEmsData(session, fde)
                 storeEmsData(influxWriteAPI, fmsd, fde)
 
-        logger.info("monitorEMS - cycle completed")
+        logger.debug("monitorEMS - cycle completed")
 
         if testRun:
             # Stop in case of test run
             stop = True
+
+        exceptioncount = 0
 
     except EmsAccessError:
         logger.info("No access to EMS")
@@ -753,12 +756,20 @@ while not stop:
 
     except Exception as error:
         stop = True
-        logger.critical("Unexpected Exception: %s", error)
-        if influxClient:
-            del influxClient
-        if influxWriteAPI:
-            del influxWriteAPI
-        raise error
+        exceptioncount += 1
+        if exceptioncount <= 1:
+            logger.error("Unexpected Exception (%s): %s", error.__class__, error.__cause__)
+            stop = False
+            noWait = True
+            waitUntilMidnight = False
+            time.sleep(10)
+        else:
+            logger.critical("Unexpected Exception: %s", error)
+            if influxClient:
+                del influxClient
+            if influxWriteAPI:
+                del influxWriteAPI
+            raise error
 
     except KeyboardInterrupt:
         stop = True
