@@ -757,7 +757,7 @@ while not stop:
     except Exception as error:
         stop = True
         exceptioncount += 1
-        if exceptioncount <= 1:
+        if exceptioncount <= 10:
             logger.error("Unexpected Exception (%s): %s", error.__class__, error.__cause__)
             stop = False
             noWait = True
